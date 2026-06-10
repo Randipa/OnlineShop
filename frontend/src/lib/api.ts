@@ -77,6 +77,22 @@ export const api = {
     request<Order>("/orders", { method: "POST", body: JSON.stringify(data) }),
   getOrder: (id: string) => request<Order>(`/orders/${id}`),
   myOrders: () => request<Order[]>("/orders/my"),
+  getPaymentMethods: () =>
+    request<{ methods: ("STRIPE" | "PAYHERE")[] }>("/payments/methods"),
+  getStripeConfig: () =>
+    request<{ configured: boolean; publishableKey: string | null }>("/payments/stripe-config"),
+  initiatePayment: (orderId: string, method: "STRIPE" | "PAYHERE") =>
+    request<{
+      method: "STRIPE" | "PAYHERE";
+      clientSecret?: string;
+      paymentIntentId?: string;
+      actionUrl?: string;
+      fields?: Record<string, string>;
+      checkoutUrl?: string;
+    }>("/payments/initiate", {
+      method: "POST",
+      body: JSON.stringify({ orderId, method }),
+    }),
   createPaymentIntent: (orderId: string) =>
     request<{ clientSecret: string; paymentIntentId: string; amount: number }>(
       "/payments/create-intent",
@@ -88,7 +104,7 @@ export const api = {
   confirmPayment: (orderId: string, paymentIntentId: string) =>
     request<Order>("/payments/confirm", {
       method: "POST",
-      body: JSON.stringify({ orderId, paymentIntentId }),
+      body: JSON.stringify({ orderId, paymentIntentId, method: "STRIPE" }),
     }),
   getInventory: () => request<Product[]>("/products/inventory"),
   getAllOrders: () => request<Order[]>("/orders"),

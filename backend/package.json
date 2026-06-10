@@ -9,7 +9,7 @@
     "start:prod": "node dist/src/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:seed": "ts-node --transpile-only --project prisma/tsconfig.seed.json prisma/seed.ts",
     "db:push": "prisma db push && npm run prisma:seed",
     "db:migrate": "prisma migrate deploy && npm run prisma:seed",
     "lint": "tsc --noEmit"
@@ -36,7 +36,7 @@
     "stripe": "^17.4.0"
   },
   "prisma": {
-    "seed": "ts-node --transpile-only prisma/seed.ts"
+    "seed": "ts-node --transpile-only --project prisma/tsconfig.seed.json prisma/seed.ts"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",

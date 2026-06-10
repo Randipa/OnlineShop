@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { OrderStatus, Prisma } from "@prisma/client";
+import { OrderStatus, PaymentMethod, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 
@@ -84,7 +84,15 @@ export class OrdersService {
     });
   }
 
-  async fulfillPayment(orderId: string, stripePaymentId: string) {
+  async assertOrderOwner(orderId: string, userId: string) {
+    const order = await this.findOne(orderId);
+    if (order.userId !== userId) {
+      throw new ForbiddenException("You do not have access to this order");
+    }
+    return order;
+  }
+
+  async fulfillPayment(orderId: string, paymentId: string, paymentMethod: PaymentMethod) {
     return this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
@@ -111,7 +119,7 @@ export class OrdersService {
 
       return tx.order.update({
         where: { id: orderId },
-        data: { status: OrderStatus.PAID, stripePaymentId },
+        data: { status: OrderStatus.PAID, paymentId, paymentMethod },
         include: { items: { include: { product: true } } },
       });
     });

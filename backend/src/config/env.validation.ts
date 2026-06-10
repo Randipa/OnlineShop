@@ -11,12 +11,40 @@ class EnvironmentVariables {
   JWT_SECRET!: string;
 
   @IsString()
-  @IsNotEmpty()
-  STRIPE_SECRET_KEY!: string;
+  @IsOptional()
+  STRIPE_SECRET_KEY?: string;
 
   @IsString()
-  @IsNotEmpty()
-  STRIPE_WEBHOOK_SECRET!: string;
+  @IsOptional()
+  STRIPE_WEBHOOK_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  STRIPE_PUBLISHABLE_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  PAYHERE_MERCHANT_ID?: string;
+
+  @IsString()
+  @IsOptional()
+  PAYHERE_MERCHANT_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  PAYHERE_CURRENCY?: string;
+
+  @IsString()
+  @IsOptional()
+  PAYHERE_SANDBOX?: string;
+
+  @IsString()
+  @IsOptional()
+  PAYHERE_USD_TO_LKR_RATE?: string;
+
+  @IsString()
+  @IsOptional()
+  BACKEND_PUBLIC_URL?: string;
 
   @IsString()
   @IsOptional()
@@ -63,6 +91,13 @@ export function validateEnv(config: Record<string, unknown>) {
         .map((e) => Object.values(e.constraints || {}).join(", "))
         .join("\n")}`
     );
+  }
+
+  const hasStripe = Boolean(validated.STRIPE_SECRET_KEY);
+  const hasPayHere = Boolean(validated.PAYHERE_MERCHANT_ID && validated.PAYHERE_MERCHANT_SECRET);
+
+  if (!hasStripe && !hasPayHere) {
+    throw new Error("At least one payment provider must be configured (Stripe or PayHere)");
   }
 
   return validated;
