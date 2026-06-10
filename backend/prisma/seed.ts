@@ -4,30 +4,26 @@ import * as bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminPassword = await bcrypt.hash("admin123", 10);
-  const userPassword = await bcrypt.hash("user123", 10);
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminName = process.env.ADMIN_NAME || "Store Admin";
 
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@shop.com" },
-    update: {},
-    create: {
-      email: "admin@shop.com",
-      password: adminPassword,
-      name: "Admin User",
-      role: Role.ADMIN,
-    },
-  });
-
-  await prisma.user.upsert({
-    where: { email: "user@shop.com" },
-    update: {},
-    create: {
-      email: "user@shop.com",
-      password: userPassword,
-      name: "Demo User",
-      role: Role.USER,
-    },
-  });
+  if (adminEmail && adminPassword) {
+    const hashed = await bcrypt.hash(adminPassword, 12);
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { password: hashed, name: adminName, role: Role.ADMIN },
+      create: {
+        email: adminEmail,
+        password: hashed,
+        name: adminName,
+        role: Role.ADMIN,
+      },
+    });
+    console.log(`Admin account ready: ${adminEmail}`);
+  } else {
+    console.log("Skipping admin seed — set ADMIN_EMAIL and ADMIN_PASSWORD to create admin.");
+  }
 
   const categories = await Promise.all([
     prisma.category.upsert({
@@ -118,9 +114,7 @@ async function main() {
     });
   }
 
-  console.log("Seed complete!");
-  console.log("Admin:", admin.email, "/ admin123");
-  console.log("User: user@shop.com / user123");
+  console.log("Catalog seed complete.");
 }
 
 main()

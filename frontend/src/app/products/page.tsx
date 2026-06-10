@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { api } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
+import ProductSearch from "@/components/ProductSearch";
 import { Product, Category } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +17,8 @@ export default async function ProductsPage({
 
   try {
     [products, categories] = await Promise.all([
-      api.getProducts({ category: params.category, search: params.search }) as Promise<Product[]>,
-      api.getCategories() as Promise<Category[]>,
+      api.getProducts({ category: params.category, search: params.search }),
+      api.getCategories(),
     ]);
   } catch {
     products = [];
@@ -26,6 +28,10 @@ export default async function ProductsPage({
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-8">All Products</h1>
+
+      <Suspense fallback={null}>
+        <ProductSearch />
+      </Suspense>
 
       <div className="flex flex-wrap gap-2 mb-8">
         <a
