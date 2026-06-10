@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { PaymentMethod } from "../payment-method.enum";
 
 export class ConfirmPaymentDto {
   @IsString()
@@ -8,4 +9,8 @@ export class ConfirmPaymentDto {
   @IsString()
   @IsNotEmpty()
   paymentIntentId!: string;
+
+  @IsEnum(PaymentMethod)
+  @IsOptional()
+  method?: PaymentMethod;
 }
