@@ -20,6 +20,11 @@ export default function Navbar() {
           <Link href="/products" className="hover:text-brand transition-colors">
             Products
           </Link>
+          {user && (
+            <Link href="/orders" className="hover:text-brand transition-colors">
+              My Orders
+            </Link>
+          )}
           {user?.role === "ADMIN" && (
             <Link href="/admin" className="hover:text-brand transition-colors flex items-center gap-1">
               <LayoutDashboard className="w-4 h-4" /> Admin

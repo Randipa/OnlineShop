@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUUID, Min } from "class-validator";
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateProductDto {
   @IsString()
@@ -25,6 +25,7 @@ export class CreateProductDto {
   @IsOptional()
   featured?: boolean;
 
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   categoryId!: string;
 }

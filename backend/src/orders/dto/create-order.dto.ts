@@ -1,8 +1,9 @@
 import { Type } from "class-transformer";
-import { IsArray, IsInt, IsString, IsUUID, Min, ValidateNested } from "class-validator";
+import { IsArray, IsInt, IsNotEmpty, IsString, Min, MinLength, ValidateNested } from "class-validator";
 
 class OrderItemDto {
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   productId!: string;
 
   @IsInt()
@@ -12,6 +13,7 @@ class OrderItemDto {
 
 export class CreateOrderDto {
   @IsString()
+  @MinLength(10)
   shippingAddress!: string;
 
   @IsArray()
