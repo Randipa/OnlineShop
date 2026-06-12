@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { ApiError } from "@/lib/api";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("user@shop.com");
-  const [password, setPassword] = useState("user123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -20,7 +22,7 @@ export default function LoginPage() {
       await login(email, password);
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof ApiError ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -58,8 +60,11 @@ export default function LoginPage() {
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
-        <p className="text-xs text-gray-400 text-center">
-          Demo: user@shop.com / user123 | Admin: admin@shop.com / admin123
+        <p className="text-sm text-center text-gray-500">
+          No account?{" "}
+          <Link href="/register" className="text-brand hover:underline">
+            Create an account
+          </Link>
         </p>
       </form>
     </div>
